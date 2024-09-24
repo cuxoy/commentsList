@@ -1,6 +1,5 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 
-// Асинхронное получение комментариев с API
 export const fetchComments = createAsyncThunk(
   "comments/fetchComments",
   async () => {
@@ -20,7 +19,6 @@ const commentsSlice = createSlice({
   initialState: { comments: [], status: "idle", error: null },
   reducers: {
     addComment: (state, action) => {
-      // Используйте unshift, чтобы добавить комментарий в начало списка
       state.comments.unshift(action.payload);
     },
     deleteComment: (state, action) => {
