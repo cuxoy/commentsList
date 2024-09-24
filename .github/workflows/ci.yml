@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main # Запускать при пуше в главную ветку
+  pull_request:
+    branches:
+      - main # Запускать при создании pull request в главную ветку
+
+jobs:
+  build:
+    runs-on: ubuntu-latest # Операционная система для выполнения
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2 # Клонировать код из репозитория
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: "20" # Укажите версию Node.js, которую вы используете
+
+      - name: Install dependencies
+        run: npm install # Установка зависимостей проекта
+
+      - name: Run tests
+        run: npm test # Запуск тестов с использованием Jest
+
+      - name: Build
+        run: npm run build # Сборка проекта (если требуется)
+
