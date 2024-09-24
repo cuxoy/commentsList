@@ -6,17 +6,18 @@ export const fetchComments = createAsyncThunk(
   async () => {
     const response = await fetch("https://dummyjson.com/comments");
     const data = await response.json();
-    return data.comments;
+    return data.comments.map((comment) => ({
+      id: comment.id,
+      body: comment.body,
+      likes: comment.likes,
+      user: comment.user,
+    }));
   }
 );
 
 const commentsSlice = createSlice({
   name: "comments",
-  initialState: {
-    comments: [],
-    status: "idle",
-    error: null,
-  },
+  initialState: { comments: [], status: "idle", error: null },
   reducers: {
     addComment: (state, action) => {
       state.comments.push(action.payload);
@@ -25,6 +26,13 @@ const commentsSlice = createSlice({
       state.comments = state.comments.filter(
         (comment) => comment.id !== action.payload
       );
+    },
+    editComment: (state, action) => {
+      const { id, newBody } = action.payload;
+      const comment = state.comments.find((comment) => comment.id === id);
+      if (comment) {
+        comment.body = newBody;
+      }
     },
   },
   extraReducers: (builder) => {
@@ -42,6 +50,5 @@ const commentsSlice = createSlice({
       });
   },
 });
-
-export const { addComment, deleteComment } = commentsSlice.actions;
+export const { addComment, deleteComment, editComment } = commentsSlice.actions;
 export default commentsSlice.reducer;
