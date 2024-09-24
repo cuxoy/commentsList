@@ -20,7 +20,8 @@ const commentsSlice = createSlice({
   initialState: { comments: [], status: "idle", error: null },
   reducers: {
     addComment: (state, action) => {
-      state.comments.push(action.payload);
+      // Используйте unshift, чтобы добавить комментарий в начало списка
+      state.comments.unshift(action.payload);
     },
     deleteComment: (state, action) => {
       state.comments = state.comments.filter(
@@ -50,5 +51,6 @@ const commentsSlice = createSlice({
       });
   },
 });
+
 export const { addComment, deleteComment, editComment } = commentsSlice.actions;
 export default commentsSlice.reducer;

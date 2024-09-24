@@ -1,10 +1,15 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useDispatch, useSelector } from "react-redux";
-import { deleteComment, editComment } from "../app/commentsSlice";
+import {
+  deleteComment,
+  editComment,
+  fetchComments,
+} from "../app/commentsSlice";
+import ScrollRestoration from "./ScrollRestoration";
 
 const CommentList = () => {
-  const { comments } = useSelector((state) => state.comments);
+  const { comments, status, error } = useSelector((state) => state.comments);
   const dispatch = useDispatch();
   const [editingId, setEditingId] = useState(null);
   const [newBody, setNewBody] = useState("");
@@ -15,15 +20,30 @@ const CommentList = () => {
   };
 
   const saveEdit = (id) => {
-    dispatch(editComment({ id, newBody }));
-    setEditingId(null);
+    if (newBody.trim()) {
+      dispatch(editComment({ id, newBody }));
+      setEditingId(null);
+    }
   };
+
+  useEffect(() => {
+    dispatch(fetchComments());
+  }, [dispatch]);
+
+  if (status === "loading") {
+    return <Loading>Loading comments...</Loading>;
+  }
+
+  if (status === "failed") {
+    return <Error>Error: {error}</Error>;
+  }
 
   return (
     <div>
+      <ScrollRestoration />
       {comments.map((comment) => (
         <CommentContainer key={comment.id}>
-          <Username fullName={comment.user.fullName}>
+          <Username fullname={comment.user.fullName}>
             {comment.user.username}
           </Username>
           {editingId === comment.id ? (
@@ -31,6 +51,7 @@ const CommentList = () => {
               type="text"
               value={newBody}
               onChange={(e) => setNewBody(e.target.value)}
+              placeholder="Edit your comment"
             />
           ) : (
             <CommentBody>{comment.body}</CommentBody>
@@ -58,13 +79,15 @@ export const CommentContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  max-width: 600px;
+  margin: 0 auto;
 `;
 
 export const Username = styled.span`
   font-weight: bold;
   position: relative;
   &:hover::after {
-    content: "${(props) => props.fullName}";
+    content: "${(props) => props.fullname}";
     position: absolute;
     left: 0;
     bottom: -20px;
@@ -98,6 +121,17 @@ export const Button = styled.button`
   &:hover {
     background-color: #0056b3;
   }
+`;
+
+export const Error = styled.div`
+  text-align: center;
+  font-size: 50px;
+  color: red;
+`;
+
+export const Loading = styled.div`
+  text-align: center;
+  font-size: 50px;
 `;
 
 export default CommentList;

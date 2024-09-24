@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { useDispatch } from "react-redux";
 import { addComment } from "../app/commentsSlice";
 
 const CommentForm = () => {
-  const [commentBody, setCommentBody] = useState("");
+  const [commentBody, setCommentBody] = useState(
+    () => localStorage.getItem("commentBody") || ""
+  );
   const dispatch = useDispatch();
 
   const handleSubmit = (e) => {
@@ -14,12 +16,20 @@ const CommentForm = () => {
         id: Date.now(),
         body: commentBody,
         likes: 0,
-        user: { id: 1, username: "currentUser", fullName: "Current User" },
+        user: {
+          id: Date.now(),
+          username: "currentUser",
+          fullName: "Current User",
+        },
       };
       dispatch(addComment(newComment));
       setCommentBody("");
     }
   };
+
+  useEffect(() => {
+    localStorage.setItem("commentBody", commentBody);
+  }, [commentBody]);
 
   return (
     <Form onSubmit={handleSubmit}>
